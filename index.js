@@ -121,6 +121,28 @@ async function exportTablesToExcel(outputPath, tables) {
               row.age_min,
               row.age_max,
               row.unit,
+              row.low_male,
+              row.high_male,
+              row.low_female,
+              row.high_female,
+              row.critical_low_male,
+              row.critical_high_male,
+              row.critical_low_female,
+              row.critical_high_female,
+              row.normal_flag,
+              row.low_flag,
+              row.high_flag,
+              row.critical_low_flag,
+              row.critical_high_flag,
+            ]);
+            break;
+
+          case 5:
+            worksheet.addRow([
+              row.name,
+              row.age_min,
+              row.age_max,
+              row.unit,
               row.male_value,
               row.female_value,
               row.normal_flag,
@@ -129,7 +151,7 @@ async function exportTablesToExcel(outputPath, tables) {
             ]);
             break;
 
-          case 5:
+          case 6:
             worksheet.addRow([
               row.name,
               row.age_min,

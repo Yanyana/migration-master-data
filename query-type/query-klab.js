@@ -164,8 +164,10 @@ const querydata = [
     numeric.female_max as high_female, 
     numeric.unspecified_min, 
     numeric.unspecified_max,
-    numeric.critical_min,
-    numeric.critical_max,
+    numeric.critical_min as critical_low_male,
+    numeric.critical_max as critical_high_male,
+    numeric.critical_min as critical_low_female,
+    numeric.critical_max as critical_high_female,
     NULL as normal_flag,
     'L' as low_flag,
     'H' as high_flag,
@@ -175,7 +177,7 @@ const querydata = [
     INNER JOIN m_test mt ON mt.uid = numeric.uid_test;`,
   },
   {
-    id: 4,
+    id: 5,
     tableName: "nilai_normal_alpha",
     sheetName: "nilai_normal_alpha",
     sheetColumns: [
@@ -204,7 +206,7 @@ const querydata = [
     AND mt.enabled = true;`,
   },
   {
-    id: 5,
+    id: 6,
     tableName: "nilai_normal_limitation",
     sheetName: "nilai_normal_limitation",
     sheetColumns: [
