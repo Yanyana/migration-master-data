@@ -154,10 +154,6 @@ async function exportTablesToExcel(outputPath, tables) {
         column.width = Math.max(column.width, 12);
       });
     }
-
-    // Menyimpan workbook ke file Excel
-    // const writeFileAsync = promisify(workbook.xlsx.writeFile);
-    // await writeFileAsync(outputPath);
     await workbook.xlsx.writeFile(outputPath);
     console.log(`Tabel berhasil diekspor ke ${outputPath}`);
   } catch (error) {
@@ -169,5 +165,5 @@ async function exportTablesToExcel(outputPath, tables) {
 }
 
 // Eksekusi fungsi exportTablesToExcel
-const outputFilePath = join(__dirname, "master-data.xlsx");
+const outputFilePath = join(__dirname + '/master/', "master-data.xlsx");
 exportTablesToExcel(outputFilePath, tables);

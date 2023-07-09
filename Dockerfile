@@ -14,4 +14,4 @@ RUN npm install
 COPY . .
 
 # Menjalankan aplikasi ketika container dijalankan
-CMD [ "node", "index.js" ]
+CMD [ "node", "main.js" ]

@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  migration:
+    build: '.'
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - master:/app/master
+
+volumes:
+  master:
