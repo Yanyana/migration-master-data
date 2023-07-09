@@ -17,8 +17,6 @@ const dbConfig = {
   database: process.env.DB_NAME,
 };
 
-console.log(process.env.DB_USER)
-
 // Daftar tabel yang akan diekspor
 const tables = querydata;
 
