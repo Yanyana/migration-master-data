@@ -1,3 +1,4 @@
+const dotenv = require("dotenv");
 const fs = require("fs");
 const { promisify } = require("util");
 const { join } = require("path");
@@ -5,14 +6,18 @@ const { Workbook } = require("exceljs");
 const { Client } = require("pg");
 const { querydata } = require("./query-type/query-klab");
 
+dotenv.config();
+
 // Konfigurasi koneksi ke database PostgreSQL
 const dbConfig = {
-  user: "postgres",
-  password: "p@ssw0rd",
-  host: "localhost",
-  port: 5432,
-  database: "KLAB_PROD",
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  database: process.env.DB_NAME,
 };
+
+console.log(process.env.DB_USER)
 
 // Daftar tabel yang akan diekspor
 const tables = querydata;
