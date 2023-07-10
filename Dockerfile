@@ -2,7 +2,7 @@
 FROM node:lts-alpine3.15
 
 # Mengatur working directory di dalam container
-WORKDIR /app
+# WORKDIR /app
 
 # Menyalin package.json dan package-lock.json (jika ada)
 COPY package*.json ./
@@ -10,10 +10,11 @@ COPY package*.json ./
 # Menginstall dependensi aplikasi
 RUN npm install
 
-RUN npm run prebuild
 
 # Menyalin seluruh kode sumber aplikasi ke dalam container
 COPY . .
+
+RUN npm run prebuild
 
 # Menjalankan aplikasi ketika container dijalankan
 CMD [ "node", "main.js" ]
