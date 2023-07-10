@@ -15,6 +15,7 @@ const siteQuery = path.join(__dirname, "..", "query-type", `${querydata}.js`);
 
 if (fs.existsSync(siteQuery)) {
   const siteQueryContent = fs.readFileSync(siteQuery, "utf8");
+  fs.writeFileSync(defaultQuery, siteQueryContent, 'utf8');
 } else {
   const defaultContent = fs.readFileSync(defaultQuery, "utf8");
 

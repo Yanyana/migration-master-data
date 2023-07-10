@@ -1,3 +1,4 @@
 /node_modules
 *.xlsx
 .env
+query-type/query-default.js
