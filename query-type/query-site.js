@@ -1,5 +1,14 @@
 const querydata = [
   {
+    id: 0,
+    tableName: "m_instrument",
+    sheetName: "m_instrument",
+    sheetColumns: ["name", "alias_name", "alias_id", "result_type", "is_bidirectional"],
+    query: `SELECT name, alias_code as alias_name, id as alias_id, 'INDIVIDUAL' as result_type, false as is_bidirectional
+    FROM m_instrument
+    ORDER BY id`,
+  },
+  {
     id: 1,
     tableName: "m_departement",
     sheetName: "m_departement",
