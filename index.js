@@ -4,7 +4,7 @@ const { promisify } = require("util");
 const { join } = require("path");
 const { Workbook } = require("exceljs");
 const { Client } = require("pg");
-const { querydata } = require("./query-type/query-klab");
+const { querydata } = require("./query-type/query-default");
 
 dotenv.config();
 

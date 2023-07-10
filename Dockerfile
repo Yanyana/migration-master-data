@@ -10,6 +10,8 @@ COPY package*.json ./
 # Menginstall dependensi aplikasi
 RUN npm install
 
+RUN npm run prebuild
+
 # Menyalin seluruh kode sumber aplikasi ke dalam container
 COPY . .
 
