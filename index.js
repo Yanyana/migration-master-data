@@ -147,7 +147,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.female_value,
               row.normal_flag,
               row.abnormal_flag,
-              row.options
+              row.options,
             ]);
             break;
 
@@ -160,13 +160,22 @@ async function exportTablesToExcel(outputPath, tables) {
               row.sign_male ? row.sign_male : row.sign_unspecified,
               row.male_value ? row.male_value : row.unspecified_normal_value,
               row.sign_female ? row.sign_female : row.sign_unspecified,
-              row.female_value ? row.female_value : row.unspecified_normal_value,
+              row.female_value
+                ? row.female_value
+                : row.unspecified_normal_value,
               row.normal_flag,
               row.abnormal_flag,
             ]);
             break;
 
           default:
+            worksheet.addRow([
+              row.name,
+              row.alias_name,
+              row.alias_id,
+              row.result_type,
+              row.is_bidirectional,
+            ]);
             break;
         }
       });
@@ -187,5 +196,5 @@ async function exportTablesToExcel(outputPath, tables) {
 }
 
 // Eksekusi fungsi exportTablesToExcel
-const outputFilePath = join(__dirname + '/master/', "master-data.xlsx");
+const outputFilePath = join(__dirname + "/master/", "master-data.xlsx");
 exportTablesToExcel(outputFilePath, tables);
