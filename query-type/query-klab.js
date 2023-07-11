@@ -3,8 +3,17 @@ const querydata = [
     id: 0,
     tableName: "m_instrument",
     sheetName: "master_instrument",
-    sheetColumns: ["name", "alias_name", "alias_id", "result_type", "is_bidirectional"],
-    query: `SELECT name, name as alias_name, id as alias_id, 'INDIVIDUAL' as result_type, false as is_bidirectional
+    sheetColumns: [
+      "name",
+      "alias_name",
+      "alias_id",
+      "panel_order_type",
+      "result_type",
+      "is_bidirectional",
+    ],
+    query: `SELECT name, name as alias_name, id as alias_id, 
+    'INDIVIDUAL' as panel_order_type,
+    'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
     ORDER BY id`,
   },
@@ -12,7 +21,13 @@ const querydata = [
     id: 1,
     tableName: "m_department",
     sheetName: "master_departement",
-    sheetColumns: ["name", "english_name", "position", "type", "department_type"],
+    sheetColumns: [
+      "name",
+      "english_name",
+      "position",
+      "type",
+      "department_type",
+    ],
     query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' AS department_type
     FROM "m_group"
     UNION
@@ -57,6 +72,7 @@ const querydata = [
       "note_decrease_en",
       "note_other_en",
       "price",
+      "bridging_code",
       "department_type"
     ],
     query: `SELECT 
@@ -78,9 +94,14 @@ const querydata = [
     ls.specimen, 
     tube.tube, 
     method.metode,
-    (SELECT STRING_AGG(minst.name, ', ') AS instrument
-    FROM m_instrument minst
-    WHERE minst.uid::text IN (mt.uid_instruments)), 
+    (SELECT COALESCE(
+        (
+            SELECT STRING_AGG(minst.name, ', ') AS instrument
+            FROM m_instrument minst
+            WHERE minst.uid::text IN (mt.uid_instruments)
+        ),
+        'Manual'
+    )) AS instrument,
     plan.name as run_plan,
     tat.days as tat_days,
     tat.hours as tat_hours,
@@ -94,7 +115,8 @@ const querydata = [
     note.decrease_en as note_decrease_en,
     note.other_en as note_other_en,
     tariff.tariff as price,
-    'PK' AS department_type
+    NULL as bridging_code,
+    'PK' as department_type
     FROM m_test as mt
     left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
     inner join m_departement md ON md.uid = mt.uid_departement
@@ -118,14 +140,25 @@ const querydata = [
       "departement",
       "name",
       "english_name",
+      "speciment",
       "position",
       "members",
-      "department_type"
+      "department_type",
     ],
     query: `SELECT
     md.departement,
     mtp.panel_name AS name,
     CASE WHEN mtp.language_1 = '' THEN NULL ELSE mtp.language_1 END AS english_name,
+    (SELECT COALESCE(
+      (SELECT spec.specimen
+        FROM c_test_panel memberpanel
+        INNER JOIN m_test test ON test.uid = memberpanel.uid_test
+        INNER JOIN l_specimen spec ON spec.uid = test.uid_specimen
+        WHERE uid_panel = mtp.uid AND memberpanel.enabled = true
+        AND test.uid_specimen IS NOT NULL
+        LIMIT 1),
+        '-'
+    )) AS specimen,
     mtp.position,
     (
       SELECT string_agg(mt.test_name, ', ' ORDER BY mt.position ASC)
@@ -151,7 +184,9 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
+      "age_max_unit",
       "unit",
       "low_male",
       "high_male",
@@ -169,13 +204,19 @@ const querydata = [
     ],
     query: `SELECT mt.test_name AS name, 
     numeric.age_min, 
-    numeric.age_max, 
     CASE
-        WHEN l.age_unit = 'b' THEN 'MONTH'
-        WHEN l.age_unit = 't' THEN 'YEAR'
-        WHEN l.age_unit = 'h' THEN 'DAY'
+        WHEN numeric.age_unit = 'b' THEN 'MONTH'
+        WHEN numeric.age_unit = 't' THEN 'YEAR'
+        WHEN numeric.age_unit = 'h' THEN 'DAY'
     ELSE 'YEAR'
-    END AS unit,
+    END AS age_min_unit,
+    numeric.age_max,
+    CASE
+        WHEN numeric.age_unit = 'b' THEN 'MONTH'
+        WHEN numeric.age_unit = 't' THEN 'YEAR'
+        WHEN numeric.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_max_unit, 
     numeric.male_min as low_male, 
     numeric.male_max as high_male, 
     numeric.female_min as low_female, 
@@ -201,23 +242,31 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
+      "age_max_unit",
       "unit",
       "male_value",
       "female_value",
       "normal_flag",
       "abnormal_flag",
-      "options"
+      "options",
     ],
     query: `SELECT mt.test_name AS name, 
     alpha.age_min, 
+    CASE
+        WHEN alpha.age_unit = 'b' THEN 'MONTH'
+        WHEN alpha.age_unit = 't' THEN 'YEAR'
+        WHEN alpha.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_min_unit,
     alpha.age_max, 
     CASE
-        WHEN l.age_unit = 'b' THEN 'MONTH'
-        WHEN l.age_unit = 't' THEN 'YEAR'
-        WHEN l.age_unit = 'h' THEN 'DAY'
+        WHEN alpha.age_unit = 'b' THEN 'MONTH'
+        WHEN alpha.age_unit = 't' THEN 'YEAR'
+        WHEN alpha.age_unit = 'h' THEN 'DAY'
     ELSE 'YEAR'
-    END AS unit,
+    END AS age_max_unit,
     alpha.male_text as male_value,
     alpha.female_text as female_value,
     NULL AS normal_flag,
@@ -235,24 +284,31 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
-      "unit",
+      "age_max_unit",
       "sign_male",
       "male_value",
       "sign_female",
       "female_value",
       "normal_flag",
-      "abnormal_flag"
+      "abnormal_flag",
     ],
     query: `SELECT mt.test_name AS name, 
     l.age_min, 
+    CASE
+        WHEN l.age_unit = 'b' THEN 'MONTH'
+        WHEN l.age_unit = 't' THEN 'YEAR'
+        WHEN l.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_min_unit,
     l.age_max,
     CASE
         WHEN l.age_unit = 'b' THEN 'MONTH'
         WHEN l.age_unit = 't' THEN 'YEAR'
         WHEN l.age_unit = 'h' THEN 'DAY'
     ELSE 'YEAR'
-    END AS unit,
+    END AS age_max_unit,
     l.sign_male, 
     l.male_normal_value as male_value, 
     l.sign_female, 

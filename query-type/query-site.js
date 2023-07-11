@@ -3,8 +3,17 @@ const querydata = [
     id: 0,
     tableName: "m_instrument",
     sheetName: "master_instrument",
-    sheetColumns: ["name", "alias_name", "alias_id", "result_type", "is_bidirectional"],
-    query: `SELECT name, name as alias_name, id as alias_id, 'INDIVIDUAL' as result_type, false as is_bidirectional
+    sheetColumns: [
+      "name",
+      "alias_name",
+      "alias_id",
+      "panel_order_type",
+      "result_type",
+      "is_bidirectional",
+    ],
+    query: `SELECT name, name as alias_name, id as alias_id, 
+    'INDIVIDUAL' as panel_order_type, 
+    'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
     ORDER BY id`,
   },
@@ -12,11 +21,17 @@ const querydata = [
     id: 1,
     tableName: "m_departement",
     sheetName: "master_departement",
-    sheetColumns: ["name", "english_name", "position", "type", "department_type"],
-    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type
+    sheetColumns: [
+      "name",
+      "english_name",
+      "position",
+      "type",
+      "department_type",
+    ],
+    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' as department_type
       FROM "m_group"
       UNION
-      SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type
+      SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type, 'PK' as department_type
       FROM m_departement md
       ORDER BY position;`,
   },
@@ -35,14 +50,14 @@ const querydata = [
       "english_name",
       "unit",
       "decimal",
-      "result_type",
+      "results_type",
       "is_transaction",
       "is_analyze",
       "is_formula",
       "is_rulebase",
       "speciment",
       "tube",
-      "method",
+      "methode",
       "instrument",
       "run_plan",
       "tat_days",
@@ -57,7 +72,8 @@ const querydata = [
       "note_decrease_en",
       "note_other_en",
       "price",
-      "department_type"
+      "bridging_code",
+      "department_type",
     ],
     query: `SELECT 
       Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
@@ -70,7 +86,7 @@ const querydata = [
       mt.language_1 as english_name,
       lu.unit, 
       mt.decimal_digit as decimal, 
-      UPPER(result.results_type) as result_type, 
+      UPPER(result.results_type) as results_type, 
       Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
       Case when mt.id_parent IS NOT NULL then true else true end as is_analyze,
       Case when mt.formula IS NULL then false else mt.formula end as is_formula,
@@ -98,8 +114,9 @@ const querydata = [
       NULL as note_increase_en,
       NULL as note_decrease_en,
       NULL as note_other_en,
-      tariff.tariff as price
-      'PK' AS department_type
+      tariff.tariff as price,
+      NULL as bridging_code,
+      'PK' as department_type
       FROM m_test as mt
       left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
       inner join m_departement md ON md.uid = mt.uid_departement
@@ -119,14 +136,25 @@ const querydata = [
       "department",
       "name",
       "english_name",
+      "speciment",
       "position",
       "members",
-      "department_type"
+      "department_type",
     ],
     query: `SELECT
     md.departement,
     mtp.panel_name AS name,
     CASE WHEN mtp.language_1 = '' THEN NULL ELSE mtp.language_1 END AS english_name,
+    (SELECT COALESCE(
+      (SELECT spec.specimen
+        FROM c_test_panel memberpanel
+        INNER JOIN m_test test ON test.uid = memberpanel.uid_test
+        INNER JOIN l_specimen spec ON spec.uid = test.uid_specimen
+        WHERE uid_panel = mtp.uid AND memberpanel.enabled = true
+        AND test.uid_specimen IS NOT NULL
+        LIMIT 1),
+        '-'
+    )) AS specimen,
     mtp.position,
     (
       SELECT string_agg(mt.test_name, ', ' ORDER BY mt.position ASC)
@@ -134,10 +162,10 @@ const querydata = [
       WHERE mt.uid IN (SELECT ctestpanel.uid_test
                        FROM c_test_panel ctestpanel
                        WHERE uid_panel = mtp.uid and ctestpanel.enabled = true)
-                       AND mt.enabled = true
-    ) AS members
-    'PK' AS department_type
-    FROM
+      AND mt.enabled = true
+    ) AS members,
+    'PK' as department_type
+  FROM
     m_test_panel mtp
   INNER JOIN
     m_departement md ON md.uid = mtp.uid_departement
@@ -152,7 +180,9 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
+      "age_max_unit",
       "unit",
       "low_male",
       "high_male",
@@ -170,13 +200,9 @@ const querydata = [
     ],
     query: `SELECT mt.test_name AS name, 
       numeric.age_min, 
-      numeric.age_max, 
-      CASE
-        WHEN numeric.age_unit = 'b' THEN 'MONTH'
-        WHEN numeric.age_unit = 't' THEN 'YEAR'
-        WHEN numeric.age_unit = 'h' THEN 'DAY'
-      ELSE 'YEAR'
-      END AS unit,
+      COALESCE(UPPER(NULLIF(numeric.age_unit, '')), 'T') as age_min_unit,
+      numeric.age_max,
+      COALESCE(UPPER(NULLIF(numeric.age_unit, '')), 'T') as age_max_unit,
       numeric.male_min as low_male, 
       numeric.male_max as high_male, 
       numeric.female_min as low_female, 
@@ -202,7 +228,9 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
+      "age_max_unit",
       "unit",
       "male_value",
       "female_value",
@@ -212,13 +240,9 @@ const querydata = [
     ],
     query: `SELECT mt.test_name AS name, 
       alpha.age_min, 
+      COALESCE(UPPER(NULLIF(alpha.age_unit, '')), 'T') AS age_min_unit,
       alpha.age_max, 
-      CASE
-        WHEN alpha.age_unit = 'b' THEN 'MONTH'
-        WHEN alpha.age_unit = 't' THEN 'YEAR'
-        WHEN alpha.age_unit = 'h' THEN 'DAY'
-      ELSE 'YEAR'
-      END AS unit,
+      COALESCE(UPPER(NULLIF(alpha.age_unit, '')), 'T') AS age_max_unit,
       alpha.male_text as male_value,
       alpha.female_text as female_value,
       NULL AS normal_flag,
@@ -236,7 +260,9 @@ const querydata = [
     sheetColumns: [
       "name",
       "age_min",
+      "age_min_unit",
       "age_max",
+      "age_max_unit",
       "unit",
       "sign_male",
       "male_value",
@@ -247,13 +273,9 @@ const querydata = [
     ],
     query: `SELECT mt.test_name AS name, 
       l.age_min, 
+      COALESCE(UPPER(NULLIF(l.age_unit, '')), 'T') AS age_min_unit,
       l.age_max,
-      CASE
-        WHEN l.age_unit = 'b' THEN 'MONTH'
-        WHEN l.age_unit = 't' THEN 'YEAR'
-        WHEN l.age_unit = 'h' THEN 'DAY'
-      ELSE 'YEAR'
-      END AS unit,
+      COALESCE(UPPER(NULLIF(l.age_unit, '')), 'T') AS age_max_unit,
       l.sign_male, 
       l.male_normal_value as male_value, 
       l.sign_female, 
