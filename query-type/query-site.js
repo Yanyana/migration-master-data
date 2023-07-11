@@ -81,7 +81,8 @@ const querydata = [
     md.departement, 
     parentTest.test_name as parent,
     mt.alias_code, 
-    Case when mt.alias_name = 'null' then NULL else mt.alias_name end as local_code,  
+    Case when mt.alias_name = 'null' then NULL 
+    when mt.alias_name IS NULL then mt.alias_code else mt.alias_name end as local_code,  
     mt.test_name as name, 
     mt.language_1 as english_name,
     lu.unit, 
