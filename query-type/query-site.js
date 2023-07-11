@@ -12,7 +12,7 @@ const querydata = [
     id: 1,
     tableName: "m_departement",
     sheetName: "master_departement",
-    sheetColumns: ["name", "english_name", "position", "type"],
+    sheetColumns: ["name", "english_name", "position", "type", "department_type"],
     query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type
       FROM "m_group"
       UNION
@@ -57,6 +57,7 @@ const querydata = [
       "note_decrease_en",
       "note_other_en",
       "price",
+      "department_type"
     ],
     query: `SELECT 
       Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
@@ -98,6 +99,7 @@ const querydata = [
       NULL as note_decrease_en,
       NULL as note_other_en,
       tariff.tariff as price
+      'PK' AS department_type
       FROM m_test as mt
       left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
       inner join m_departement md ON md.uid = mt.uid_departement
@@ -119,6 +121,7 @@ const querydata = [
       "english_name",
       "position",
       "members",
+      "department_type"
     ],
     query: `SELECT
     md.departement,
@@ -133,7 +136,8 @@ const querydata = [
                        WHERE uid_panel = mtp.uid and ctestpanel.enabled = true)
                        AND mt.enabled = true
     ) AS members
-  FROM
+    'PK' AS department_type
+    FROM
     m_test_panel mtp
   INNER JOIN
     m_departement md ON md.uid = mtp.uid_departement
