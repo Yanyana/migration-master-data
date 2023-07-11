@@ -171,7 +171,12 @@ const querydata = [
     query: `SELECT mt.test_name AS name, 
       numeric.age_min, 
       numeric.age_max, 
-      COALESCE(UPPER(NULLIF(numeric.age_unit, '')), 'T') as unit, 
+      CASE
+        WHEN numeric.age_unit = 'b' THEN 'MONTH'
+        WHEN numeric.age_unit = 't' THEN 'YEAR'
+        WHEN numeric.age_unit = 'h' THEN 'DAY'
+      ELSE 'YEAR'
+      END AS unit,
       numeric.male_min as low_male, 
       numeric.male_max as high_male, 
       numeric.female_min as low_female, 
@@ -208,7 +213,12 @@ const querydata = [
     query: `SELECT mt.test_name AS name, 
       alpha.age_min, 
       alpha.age_max, 
-      COALESCE(UPPER(NULLIF(alpha.age_unit, '')), 'T') AS unit,
+      CASE
+        WHEN alpha.age_unit = 'b' THEN 'MONTH'
+        WHEN alpha.age_unit = 't' THEN 'YEAR'
+        WHEN alpha.age_unit = 'h' THEN 'DAY'
+      ELSE 'YEAR'
+      END AS unit,
       alpha.male_text as male_value,
       alpha.female_text as female_value,
       NULL AS normal_flag,
@@ -238,7 +248,12 @@ const querydata = [
     query: `SELECT mt.test_name AS name, 
       l.age_min, 
       l.age_max,
-      COALESCE(UPPER(NULLIF(l.age_unit, '')), 'T') AS unit,
+      CASE
+        WHEN l.age_unit = 'b' THEN 'MONTH'
+        WHEN l.age_unit = 't' THEN 'YEAR'
+        WHEN l.age_unit = 'h' THEN 'DAY'
+      ELSE 'YEAR'
+      END AS unit,
       l.sign_male, 
       l.male_normal_value as male_value, 
       l.sign_female, 
