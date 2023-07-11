@@ -12,14 +12,14 @@ const querydata = [
       "is_bidirectional",
     ],
     query: `SELECT name, name as alias_name, id as alias_id, 
-    'INDIVIDUAL' as panel_order_type, 
+    'INDIVIDUAL' as panel_order_type,
     'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
     ORDER BY id`,
   },
   {
     id: 1,
-    tableName: "m_departement",
+    tableName: "m_department",
     sheetName: "master_departement",
     sheetColumns: [
       "name",
@@ -28,12 +28,12 @@ const querydata = [
       "type",
       "department_type",
     ],
-    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' as department_type
-      FROM "m_group"
-      UNION
-      SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type, 'PK' as department_type
-      FROM m_departement md
-      ORDER BY position;`,
+    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' AS department_type
+    FROM "m_group"
+    UNION
+    SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type, 'PK' AS department_type
+    FROM m_departement md
+    ORDER BY position;`,
   },
   {
     id: 2,
@@ -50,14 +50,14 @@ const querydata = [
       "english_name",
       "unit",
       "decimal",
-      "results_type",
+      "result_type",
       "is_transaction",
       "is_analyze",
       "is_formula",
       "is_rulebase",
       "speciment",
       "tube",
-      "methode",
+      "method",
       "instrument",
       "run_plan",
       "tat_days",
@@ -73,67 +73,67 @@ const querydata = [
       "note_other_en",
       "price",
       "bridging_code",
-      "department_type",
+      "department_type"
     ],
     query: `SELECT 
-      Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
-      mt.position, 
-      md.departement, 
-      parentTest.test_name as parent,
-      mt.alias_code, 
-      Case when mt.alias_name = 'null' then NULL else mt.alias_name end as local_code,  
-      mt.test_name as name, 
-      mt.language_1 as english_name,
-      lu.unit, 
-      mt.decimal_digit as decimal, 
-      UPPER(result.results_type) as results_type, 
-      Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
-      Case when mt.id_parent IS NOT NULL then true else true end as is_analyze,
-      Case when mt.formula IS NULL then false else mt.formula end as is_formula,
-      Case when mt.id_parent IS NOT NULL then false else false end as is_rulebase,
-      ls.specimen, 
-      ls.specimen as tube, 
-      method.metode,
-      (SELECT COALESCE(
-    (
-        SELECT STRING_AGG(minst.name, ', ') AS instrument
-        FROM m_instrument minst
-        WHERE minst.uid::text IN (NULL)
-    ),
-    'Manual'
-)) AS instrument, 
-      'InHouse' as run_plan,
-      0 as tat_days,
-      0 as tat_hours,
-      0 as tat_minutes,
-      NULL as note_signification_clinical,
-      NULL as note_increase,
-      NULL as note_decrease,
-      NULL as note_other,
-      NULL as note_signification_clinical_en,
-      NULL as note_increase_en,
-      NULL as note_decrease_en,
-      NULL as note_other_en,
-      tariff.tariff as price,
-      NULL as bridging_code,
-      'PK' as department_type
-      FROM m_test as mt
-      left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
-      inner join m_departement md ON md.uid = mt.uid_departement
-      left join l_unit lu ON lu.uid = mt.uid_unit
-      left join m_test parentTest ON mt.id_parent = parentTest.id
-      inner join l_specimen ls ON ls.uid = mt.uid_specimen
-      left join m_method_lab method ON method.uid = mt.uid_method
-      inner join l_results_type result ON result.uid = mt.uid_result_input_type
-      where mt.enabled = true
-      Order By position`,
+    Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
+    mt.position, 
+    md.departement, 
+    parentTest.test_name as parent,
+    mt.alias_code, 
+    Case when mt.alias_name = 'null' then NULL else mt.alias_name end as local_code,  
+    mt.test_name as name, 
+    mt.language_1 as english_name,
+    lu.unit, 
+    mt.decimal_digit as decimal, 
+    UPPER(result.results_type) as result_type, 
+    Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
+    Case when mt.id_parent IS NOT NULL then true else true end as is_analyzed,
+    Case when mt.formula IS NULL then false else mt.formula end as is_formula,
+    Case when mt.id_parent IS NOT NULL then false else false end as is_rulebase,
+    ls.specimen, 
+    ls.specimen as tube, 
+    method.metode,
+    (SELECT COALESCE(
+      (
+          SELECT STRING_AGG(minst.name, ', ') AS instrument
+          FROM m_instrument minst
+          WHERE minst.uid::text IN (NULL)
+      ),
+      'Manual'
+  )) AS instrument, 
+    'InHouse' as run_plan,
+    0 as tat_days,
+    0 as tat_hours,
+    0 as tat_minutes,
+    NULL as note_signification_clinical,
+    NULL as note_increase,
+    NULL as note_decrease,
+    NULL as note_other,
+    NULL as note_signification_clinical_en,
+    NULL as note_increase_en,
+    NULL as note_decrease_en,
+    NULL as note_other_en,
+    tariff.tariff as price,
+    NULL as bridging_code,
+    'PK' as department_type
+    FROM m_test as mt
+    left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
+    inner join m_departement md ON md.uid = mt.uid_departement
+    left join l_unit lu ON lu.uid = mt.uid_unit
+    left join m_test parentTest ON mt.id_parent = parentTest.id
+    inner join l_specimen ls ON ls.uid = mt.uid_specimen
+    inner join m_method_lab method ON method.uid = mt.uid_method
+    inner join l_results_type result ON result.uid = mt.uid_result_input_type
+    where mt.enabled = true
+    Order By position`,
   },
   {
     id: 3,
     tableName: "m_test_panel",
     sheetName: "master_panel",
     sheetColumns: [
-      "department",
+      "departement",
       "name",
       "english_name",
       "speciment",
@@ -162,9 +162,9 @@ const querydata = [
       WHERE mt.uid IN (SELECT ctestpanel.uid_test
                        FROM c_test_panel ctestpanel
                        WHERE uid_panel = mtp.uid and ctestpanel.enabled = true)
-      AND mt.enabled = true
+                       AND mt.enabled = true
     ) AS members,
-    'PK' as department_type
+    'PK' AS department_type
   FROM
     m_test_panel mtp
   INNER JOIN
@@ -183,7 +183,6 @@ const querydata = [
       "age_min_unit",
       "age_max",
       "age_max_unit",
-      "unit",
       "low_male",
       "high_male",
       "low_female",
@@ -199,27 +198,37 @@ const querydata = [
       "critical_high_flag",
     ],
     query: `SELECT mt.test_name AS name, 
-      numeric.age_min, 
-      COALESCE(UPPER(NULLIF(numeric.age_unit, '')), 'T') as age_min_unit,
-      numeric.age_max,
-      COALESCE(UPPER(NULLIF(numeric.age_unit, '')), 'T') as age_max_unit,
-      numeric.male_min as low_male, 
-      numeric.male_max as high_male, 
-      numeric.female_min as low_female, 
-      numeric.female_max as high_female, 
-      numeric.unspecified_min, 
-      numeric.unspecified_max,
-      numeric.critical_min as critical_low_male,
-      numeric.critical_max as critical_high_male,
-      numeric.critical_min as critical_low_female,
-      numeric.critical_max as critical_high_female,
-      NULL as normal_flag,
-      'L' as low_flag,
-      'H' as high_flag,
-      'CL' as critical_low_flag,
-      'CH' as critical_high_flag
-      FROM m_normal_value_numeric_detail AS numeric
-      INNER JOIN m_test mt ON mt.uid = numeric.uid_test;`,
+    numeric.age_min, 
+    CASE
+        WHEN numeric.age_unit = 'b' THEN 'MONTH'
+        WHEN numeric.age_unit = 't' THEN 'YEAR'
+        WHEN numeric.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_min_unit,
+    numeric.age_max,
+    CASE
+        WHEN numeric.age_unit = 'b' THEN 'MONTH'
+        WHEN numeric.age_unit = 't' THEN 'YEAR'
+        WHEN numeric.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_max_unit, 
+    numeric.male_min as low_male, 
+    numeric.male_max as high_male, 
+    numeric.female_min as low_female, 
+    numeric.female_max as high_female, 
+    numeric.unspecified_min, 
+    numeric.unspecified_max,
+    numeric.critical_min as critical_low_male,
+    numeric.critical_max as critical_high_male,
+    numeric.critical_min as critical_low_female,
+    numeric.critical_max as critical_high_female,
+    NULL as normal_flag,
+    'L' as low_flag,
+    'H' as high_flag,
+    'CL' as critical_low_flag,
+    'CH' as critical_high_flag
+    FROM m_normal_value_numeric_detail AS numeric
+    INNER JOIN m_test mt ON mt.uid = numeric.uid_test;`,
   },
   {
     id: 5,
@@ -231,7 +240,6 @@ const querydata = [
       "age_min_unit",
       "age_max",
       "age_max_unit",
-      "unit",
       "male_value",
       "female_value",
       "normal_flag",
@@ -239,19 +247,29 @@ const querydata = [
       "options",
     ],
     query: `SELECT mt.test_name AS name, 
-      alpha.age_min, 
-      COALESCE(UPPER(NULLIF(alpha.age_unit, '')), 'T') AS age_min_unit,
-      alpha.age_max, 
-      COALESCE(UPPER(NULLIF(alpha.age_unit, '')), 'T') AS age_max_unit,
-      alpha.male_text as male_value,
-      alpha.female_text as female_value,
-      NULL AS normal_flag,
-      '*' AS abnormal_flag,
-      COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid), alpha.male_text) AS options
-      FROM m_normal_value_alphanum_detail AS alpha
-      INNER JOIN m_test mt ON alpha.uid_test = mt.uid
-      AND alpha.enabled = true
-      AND mt.enabled = true;`,
+    alpha.age_min, 
+    CASE
+        WHEN alpha.age_unit = 'b' THEN 'MONTH'
+        WHEN alpha.age_unit = 't' THEN 'YEAR'
+        WHEN alpha.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_min_unit,
+    alpha.age_max, 
+    CASE
+        WHEN alpha.age_unit = 'b' THEN 'MONTH'
+        WHEN alpha.age_unit = 't' THEN 'YEAR'
+        WHEN alpha.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_max_unit,
+    alpha.male_text as male_value,
+    alpha.female_text as female_value,
+    NULL AS normal_flag,
+    '*' AS abnormal_flag,
+    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid), alpha.male_text) AS options
+    FROM m_normal_value_alphanum_detail AS alpha
+    INNER JOIN m_test mt ON alpha.uid_test = mt.uid
+    AND alpha.enabled = true
+    AND mt.enabled = true;`,
   },
   {
     id: 6,
@@ -263,7 +281,6 @@ const querydata = [
       "age_min_unit",
       "age_max",
       "age_max_unit",
-      "unit",
       "sign_male",
       "male_value",
       "sign_female",
@@ -272,22 +289,32 @@ const querydata = [
       "abnormal_flag",
     ],
     query: `SELECT mt.test_name AS name, 
-      l.age_min, 
-      COALESCE(UPPER(NULLIF(l.age_unit, '')), 'T') AS age_min_unit,
-      l.age_max,
-      COALESCE(UPPER(NULLIF(l.age_unit, '')), 'T') AS age_max_unit,
-      l.sign_male, 
-      l.male_normal_value as male_value, 
-      l.sign_female, 
-      l.female_normal_value as female_value, 
-      l.sign_unspecified, 
-      l.unspecified_normal_value, 
-      l.normal_flag, 
-      l.abnormal_flag 
-      FROM m_normal_value_limitation_detail AS l
-      INNER JOIN m_test mt ON l.uid_test = mt.uid
-      where mt.enabled = true
-      order by mt.position asc;`,
+    l.age_min, 
+    CASE
+        WHEN l.age_unit = 'b' THEN 'MONTH'
+        WHEN l.age_unit = 't' THEN 'YEAR'
+        WHEN l.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_min_unit,
+    l.age_max,
+    CASE
+        WHEN l.age_unit = 'b' THEN 'MONTH'
+        WHEN l.age_unit = 't' THEN 'YEAR'
+        WHEN l.age_unit = 'h' THEN 'DAY'
+    ELSE 'YEAR'
+    END AS age_max_unit,
+    l.sign_male, 
+    l.male_normal_value as male_value, 
+    l.sign_female, 
+    l.female_normal_value as female_value, 
+    l.sign_unspecified, 
+    l.unspecified_normal_value, 
+    l.normal_flag, 
+    l.abnormal_flag 
+    FROM m_normal_value_limitation_detail AS l
+    INNER JOIN m_test mt ON l.uid_test = mt.uid
+    where mt.enabled = true
+    order by mt.position asc;`,
   },
 ];
 

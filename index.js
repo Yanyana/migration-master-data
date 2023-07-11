@@ -65,6 +65,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.english_name,
               formatPosition(row.position),
               row.type,
+              row.department_type
             ]);
             break;
 
@@ -102,6 +103,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.note_decrease_en,
               row.note_other_en,
               row.price,
+              row.bridging_code,
+              row.department_type
             ]);
             break;
 
@@ -110,8 +113,10 @@ async function exportTablesToExcel(outputPath, tables) {
               row.departement,
               row.name,
               row.english_name,
+              row.speciment,
               formatPosition(row.position),
               row.members,
+              row.department_type
             ]);
             break;
 
@@ -119,8 +124,9 @@ async function exportTablesToExcel(outputPath, tables) {
             worksheet.addRow([
               row.name,
               row.age_min,
+              row.age_min_unit,
               row.age_max,
-              row.unit,
+              row.age_max_unit,
               row.low_male,
               row.high_male,
               row.low_female,
@@ -141,8 +147,9 @@ async function exportTablesToExcel(outputPath, tables) {
             worksheet.addRow([
               row.name,
               row.age_min,
+              row.age_min_unit,
               row.age_max,
-              row.unit,
+              row.age_max_unit,
               row.male_value,
               row.female_value,
               row.normal_flag,
@@ -155,8 +162,9 @@ async function exportTablesToExcel(outputPath, tables) {
             worksheet.addRow([
               row.name,
               row.age_min,
+              row.age_min_unit,
               row.age_max,
-              row.unit,
+              row.age_max_unit,
               row.sign_male ? row.sign_male : row.sign_unspecified,
               row.male_value ? row.male_value : row.unspecified_normal_value,
               row.sign_female ? row.sign_female : row.sign_unspecified,
@@ -173,6 +181,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.name,
               row.alias_name,
               row.alias_id,
+              row.panel_order_type,
               row.result_type,
               row.is_bidirectional,
             ]);
