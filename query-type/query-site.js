@@ -2,16 +2,16 @@ const querydata = [
   {
     id: 0,
     tableName: "m_instrument",
-    sheetName: "m_instrument",
+    sheetName: "master_instrument",
     sheetColumns: ["name", "alias_name", "alias_id", "result_type", "is_bidirectional"],
-    query: `SELECT name, alias_code as alias_name, id as alias_id, 'INDIVIDUAL' as result_type, false as is_bidirectional
+    query: `SELECT name, name as alias_name, id as alias_id, 'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
     ORDER BY id`,
   },
   {
     id: 1,
     tableName: "m_departement",
-    sheetName: "m_departement",
+    sheetName: "master_departement",
     sheetColumns: ["name", "english_name", "position", "type"],
     query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type
       FROM "m_group"
@@ -27,7 +27,7 @@ const querydata = [
     sheetColumns: [
       "type",
       "position",
-      "departement",
+      "department",
       "parent",
       "alias_code",
       "local_code",
@@ -42,7 +42,7 @@ const querydata = [
       "is_rulebase",
       "speciment",
       "tube",
-      "metode",
+      "methode",
       "instrument",
       "run_plan",
       "tat_days",
@@ -61,7 +61,7 @@ const querydata = [
     query: `SELECT 
       Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
       mt.position, 
-      md.departement, 
+      md.department, 
       parentTest.test_name as parent,
       mt.alias_code, 
       Case when mt.alias_name = 'null' then NULL else mt.alias_name end as local_code,  
@@ -112,9 +112,9 @@ const querydata = [
   {
     id: 3,
     tableName: "m_test_panel",
-    sheetName: "m_test_panel",
+    sheetName: "master_panel",
     sheetColumns: [
-      "departement",
+      "department",
       "name",
       "english_name",
       "position",
