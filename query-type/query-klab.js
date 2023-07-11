@@ -40,7 +40,7 @@ const querydata = [
       "is_analyze",
       "is_formula",
       "is_rulebase",
-      "specimen",
+      "speciment",
       "tube",
       "metode",
       "instrument",
