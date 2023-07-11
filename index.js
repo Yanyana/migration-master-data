@@ -81,7 +81,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.english_name,
               row.unit,
               row.decimal,
-              row.results_type,
+              row.result_type,
               row.is_transaction,
               row.is_analyze,
               row.is_formula,

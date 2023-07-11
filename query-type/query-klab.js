@@ -20,7 +20,7 @@ const querydata = [
   {
     id: 1,
     tableName: "m_department",
-    sheetName: "master_departement",
+    sheetName: "master_department",
     sheetColumns: [
       "name",
       "english_name",
@@ -89,7 +89,7 @@ const querydata = [
     mt.decimal_digit as decimal, 
     UPPER(result.results_type) as result_type, 
     Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
-    Case when mt.id_parent IS NOT NULL then true else true end as is_analyzed,
+    Case when mt.id_parent IS NOT NULL then true else true end as is_analyze,
     Case when mt.formula IS NULL then false else mt.formula end as is_formula,
     Case when mt.id_parent IS NOT NULL then false else false end as is_rulebase,
     ls.specimen, 
