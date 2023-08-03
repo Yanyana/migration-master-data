@@ -15,6 +15,7 @@ const querydata = [
     'INDIVIDUAL' as panel_order_type,
     'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
+    WHERE enabled = true
     ORDER BY id`,
   },
   {
@@ -28,12 +29,21 @@ const querydata = [
       "type",
       "department_type",
     ],
-    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' AS department_type
-    FROM "m_group"
-    UNION
-    SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type, 'PK' AS department_type
-    FROM m_departement md
-    ORDER BY position;`,
+    query: `SELECT "group" AS name,
+    "language_1" AS english_name,
+    "position",
+    'SUB_DEPARTMENT' AS type,
+    'PK' AS department_type
+  FROM "m_group"
+  UNION
+  SELECT md.departement as name,
+    md.language_1 as english_name,
+    md.position,
+    'DEPARTMENT' AS type,
+    'PK' AS department_type
+  FROM m_departement md
+  where md.enabled = true
+  ORDER BY position;`,
   },
   {
     id: 2,
@@ -73,7 +83,7 @@ const querydata = [
       "note_other_en",
       "price",
       "bridging_code",
-      "department_type"
+      "department_type",
     ],
     query: `SELECT 
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
@@ -82,12 +92,12 @@ const querydata = [
     parentTest.test_name as parent,
     mt.alias_code, 
     Case when mt.alias_name = 'null' then NULL 
-    when mt.alias_name IS NULL then mt.alias_code else mt.alias_name end as local_code,  
+    when mt.alias_name IS NULL then mt.alias_code else mt.alias_name end as local_code, 
     mt.test_name as name, 
     mt.language_1 as english_name,
     lu.unit, 
     mt.decimal_digit as decimal, 
-    UPPER(result.results_type) as result_type, 
+    REPLACE(UPPER(result.results_type), ' ', '') as result_type, 
     Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
     Case when mt.id_parent IS NOT NULL then true else true end as is_analyze,
     Case when mt.formula IS NULL then false else mt.formula end as is_formula,
@@ -95,14 +105,7 @@ const querydata = [
     ls.specimen, 
     ls.specimen as tube, 
     method.metode,
-    (SELECT COALESCE(
-      (
-          SELECT STRING_AGG(minst.name, ', ') AS instrument
-          FROM m_instrument minst
-          WHERE minst.uid::text IN (NULL)
-      ),
-      'Manual'
-  )) AS instrument, 
+    'Manual'AS instrument,
     'InHouse' as run_plan,
     0 as tat_days,
     0 as tat_hours,
@@ -115,19 +118,21 @@ const querydata = [
     NULL as note_increase_en,
     NULL as note_decrease_en,
     NULL as note_other_en,
-    tariff.tariff as price,
+    '10000' as price,
     NULL as bridging_code,
     'PK' as department_type
     FROM m_test as mt
-    left join m_tariff tariff ON tariff.uid_test = mt.uid AND tariff.uid_patient_type = 'dc401a5a-e229-4397-95e0-2edf2e9150e9'
     inner join m_departement md ON md.uid = mt.uid_departement
     left join l_unit lu ON lu.uid = mt.uid_unit
     left join m_test parentTest ON mt.id_parent = parentTest.id
-    inner join l_specimen ls ON ls.uid = mt.uid_specimen
-    inner join m_method_lab method ON method.uid = mt.uid_method
-    inner join l_results_type result ON result.uid = mt.uid_result_input_type
+    left join l_specimen ls ON ls.uid = mt.uid_specimen
+    left join m_method_lab method ON method.uid = mt.uid_method
+    left join l_results_type result ON result.uid = mt.uid_result_input_type
     where mt.enabled = true
-    Order By position`,
+    ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 3,
@@ -198,7 +203,7 @@ const querydata = [
       "critical_low_flag",
       "critical_high_flag",
     ],
-    query: `SELECT mt.test_name AS name, 
+    query: `SELECT mt.test_name AS name,
     numeric.age_min, 
     CASE
         WHEN numeric.age_unit = 'b' THEN 'MONTH'
@@ -229,7 +234,12 @@ const querydata = [
     'CL' as critical_low_flag,
     'CH' as critical_high_flag
     FROM m_normal_value_numeric_detail AS numeric
-    INNER JOIN m_test mt ON mt.uid = numeric.uid_test;`,
+    INNER JOIN m_test mt ON mt.uid = numeric.uid_test
+    where mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840' and numeric.enabled = true
+    ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 5,
@@ -266,11 +276,16 @@ const querydata = [
     alpha.female_text as female_value,
     NULL AS normal_flag,
     '*' AS abnormal_flag,
-    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid), alpha.male_text) AS options
+    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
     AND alpha.enabled = true
-    AND mt.enabled = true;`,
+    AND mt.enabled = true
+where mt.uid_result_input_type = '11c28a21-4f22-4659-8671-8d97defded3f' OR mt.uid_result_type_free_text = '11c28a21-4f22-4659-8671-8d97defded3f' and alpha.enabled = true and mt.enabled = true
+ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 6,
@@ -314,8 +329,11 @@ const querydata = [
     l.abnormal_flag 
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
-    where mt.enabled = true
-    order by mt.position asc;`,
+    where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true
+    ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
 ];
 
