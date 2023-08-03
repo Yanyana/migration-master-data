@@ -15,6 +15,7 @@ const querydata = [
     'INDIVIDUAL' as panel_order_type,
     'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
+    enabled = true
     ORDER BY id`,
   },
   {
@@ -28,11 +29,20 @@ const querydata = [
       "type",
       "department_type",
     ],
-    query: `SELECT "group" AS name, "language_1" AS english_name, "position", 'SUB_DEPARTMENT' AS type, 'PK' AS department_type
+    query: `SELECT "group" AS name,
+      "language_1" AS english_name,
+      "position",
+      'SUB_DEPARTMENT' AS type,
+      'PK' AS department_type
     FROM "m_group"
     UNION
-    SELECT md.departement as name, md.language_1 as english_name, md.position, 'DEPARTMENT' AS type, 'PK' AS department_type
+    SELECT md.departement as name,
+      md.language_1 as english_name,
+      md.position,
+      'DEPARTMENT' AS type,
+      'PK' AS department_type
     FROM m_departement md
+    where md.enabled = true
     ORDER BY position;`,
   },
   {
@@ -73,7 +83,7 @@ const querydata = [
       "note_other_en",
       "price",
       "bridging_code",
-      "department_type"
+      "department_type",
     ],
     query: `SELECT 
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
@@ -131,7 +141,10 @@ const querydata = [
     left join m_tat_parameter tat ON tat.uid_test = mt.uid
     left join m_clinical_note note ON note.uid_test = mt.uid
     where mt.enabled = true
-    Order By position`,
+    ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 3,
@@ -146,37 +159,50 @@ const querydata = [
       "members",
       "department_type",
     ],
-    query: `SELECT
-    md.departement,
+    query: `SELECT md.departement,
     mtp.panel_name AS name,
-    CASE WHEN mtp.language_1 = '' THEN NULL ELSE mtp.language_1 END AS english_name,
-    (SELECT COALESCE(
-      (SELECT spec.specimen
-        FROM c_test_panel memberpanel
-        INNER JOIN m_test test ON test.uid = memberpanel.uid_test
-        INNER JOIN l_specimen spec ON spec.uid = test.uid_specimen
-        WHERE uid_panel = mtp.uid AND memberpanel.enabled = true
-        AND test.uid_specimen IS NOT NULL
-        LIMIT 1),
-        '-'
-    )) AS specimen,
+    CASE
+      WHEN mtp.language_1 = '' THEN NULL
+      ELSE mtp.language_1
+    END AS english_name,
+    (
+      SELECT COALESCE(
+          (
+            SELECT spec.specimen
+            FROM c_test_panel memberpanel
+              INNER JOIN m_test test ON test.uid = memberpanel.uid_test
+              INNER JOIN l_specimen spec ON spec.uid = test.uid_specimen
+            WHERE uid_panel = mtp.uid
+              AND memberpanel.enabled = true
+              AND test.uid_specimen IS NOT NULL
+            LIMIT 1
+          ), '-'
+        )
+    ) AS specimen,
     mtp.position,
     (
-      SELECT string_agg(mt.test_name, ', ' ORDER BY mt.position ASC)
+      SELECT string_agg(
+          mt.test_name,
+          ', '
+          ORDER BY mt.position ASC
+        )
       FROM m_test mt
-      WHERE mt.uid IN (SELECT ctestpanel.uid_test
-                       FROM c_test_panel ctestpanel
-                       WHERE uid_panel = mtp.uid and ctestpanel.enabled = true)
-                       AND mt.enabled = true
+      WHERE mt.uid IN (
+          SELECT ctestpanel.uid_test
+          FROM c_test_panel ctestpanel
+          WHERE uid_panel = mtp.uid
+            and ctestpanel.enabled = true
+        )
+        AND mt.enabled = true
     ) AS members,
     'PK' AS department_type
-  FROM
-    m_test_panel mtp
-  INNER JOIN
-    m_departement md ON md.uid = mtp.uid_departement
+  FROM m_test_panel mtp
+    INNER JOIN m_departement md ON md.uid = mtp.uid_departement
   where mtp.enabled = true
-  ORDER BY
-    mtp.position ASC;`,
+  ORDER BY (
+      SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+      FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 4,
