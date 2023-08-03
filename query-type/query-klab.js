@@ -202,7 +202,7 @@ const querydata = [
       "critical_low_flag",
       "critical_high_flag",
     ],
-    query: `SELECT mt.test_name AS name, 
+    query: `SELECT mt.test_name AS name,
     numeric.age_min, 
     CASE
         WHEN numeric.age_unit = 'b' THEN 'MONTH'
@@ -233,7 +233,12 @@ const querydata = [
     'CL' as critical_low_flag,
     'CH' as critical_high_flag
     FROM m_normal_value_numeric_detail AS numeric
-    INNER JOIN m_test mt ON mt.uid = numeric.uid_test;`,
+    INNER JOIN m_test mt ON mt.uid = numeric.uid_test
+    where mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840' and numeric.enabled = true
+    ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 5,
