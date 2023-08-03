@@ -275,11 +275,16 @@ const querydata = [
     alpha.female_text as female_value,
     NULL AS normal_flag,
     '*' AS abnormal_flag,
-    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid), alpha.male_text) AS options
+    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
     AND alpha.enabled = true
-    AND mt.enabled = true;`,
+    AND mt.enabled = true
+where mt.uid_result_input_type = '11c28a21-4f22-4659-8671-8d97defded3f' OR mt.uid_result_type_free_text = '11c28a21-4f22-4659-8671-8d97defded3f' and alpha.enabled = true and mt.enabled = true
+ORDER BY (
+        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
+    ) ASC;`,
   },
   {
     id: 6,
