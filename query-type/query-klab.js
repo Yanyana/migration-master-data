@@ -15,7 +15,7 @@ const querydata = [
     'INDIVIDUAL' as panel_order_type,
     'INDIVIDUAL' as result_type, false as is_bidirectional
     FROM m_instrument
-    enabled = true
+    WHERE enabled = true
     ORDER BY id`,
   },
   {
