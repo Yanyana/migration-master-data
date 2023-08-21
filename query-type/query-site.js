@@ -277,7 +277,8 @@ const querydata = [
     alpha.female_text as female_value,
     NULL AS normal_flag,
     '*' AS abnormal_flag,
-    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options
+    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options,
+    mt.id as local_code
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
     AND alpha.enabled = true
@@ -327,7 +328,8 @@ ORDER BY (
     l.sign_unspecified, 
     l.unspecified_normal_value, 
     l.normal_flag, 
-    l.abnormal_flag 
+    l.abnormal_flag,
+    mt.id as local_code
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
     where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true
