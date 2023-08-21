@@ -33,7 +33,7 @@ const querydata = [
     "language_1" AS english_name,
     "position",
     'SUB_DEPARTMENT' AS type,
-    'PK' AS department_type
+    'PK' AS department_type, id as local_code
   FROM "m_group"
   UNION
   SELECT md.departement as name,
@@ -91,10 +91,10 @@ const querydata = [
     md.departement, 
     parentTest.test_name as parent,
     mt.alias_code, 
-    Case when mt.alias_name = 'null' then NULL 
-    when mt.alias_name IS NULL then mt.alias_code else mt.alias_name end as local_code, 
-    mt.test_name as name, 
-    mt.language_1 as english_name,
+    mt.id as local_code, 
+    mt.test_name as name,
+    Case when mt.language_1 = 'null' then NULL 
+    when mt.language_1 = '' then NULL else mt.test_name end as english_name, 
     lu.unit, 
     mt.decimal_digit as decimal, 
     REPLACE(UPPER(result.results_type), ' ', '') as result_type, 
@@ -119,7 +119,7 @@ const querydata = [
     NULL as note_decrease_en,
     NULL as note_other_en,
     '10000' as price,
-    NULL as bridging_code,
+    (SELECT test_id FROM e_mapping_test where uid_test = mt.uid limit 1) as bridging_code,
     'PK' as department_type
     FROM m_test as mt
     inner join m_departement md ON md.uid = mt.uid_departement
@@ -163,14 +163,15 @@ const querydata = [
     )) AS specimen,
     mtp.position,
     (
-      SELECT string_agg(mt.test_name, ', ' ORDER BY mt.position ASC)
+      SELECT string_agg(mt.id::text, ', ' ORDER BY mt.position ASC)
       FROM m_test mt
       WHERE mt.uid IN (SELECT ctestpanel.uid_test
                        FROM c_test_panel ctestpanel
                        WHERE uid_panel = mtp.uid and ctestpanel.enabled = true)
                        AND mt.enabled = true
     ) AS members,
-    'PK' AS department_type
+    'PK' AS department_type,
+    mtp.id as local_code
   FROM
     m_test_panel mtp
   INNER JOIN
