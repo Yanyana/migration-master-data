@@ -28,19 +28,23 @@ const querydata = [
       "position",
       "type",
       "department_type",
+      "local_code"
     ],
-    query: `SELECT "group" AS name,
-    "language_1" AS english_name,
-    "position",
+    query: `SELECT gr.group AS name,
+    gr.language_1 AS english_name,
+    gr.position,
     'SUB_DEPARTMENT' AS type,
-    'PK' AS department_type, id as local_code
-  FROM "m_group"
+    'PK' AS department_type, 
+    gr.id as local_code
+  FROM m_group as gr
+  where gr.enabled = true
   UNION
   SELECT md.departement as name,
     md.language_1 as english_name,
     md.position,
     'DEPARTMENT' AS type,
-    'PK' AS department_type
+    'PK' AS department_type,
+    md.id as local_code
   FROM m_departement md
   where md.enabled = true
   ORDER BY position;`,
@@ -119,7 +123,7 @@ const querydata = [
     NULL as note_decrease_en,
     NULL as note_other_en,
     '10000' as price,
-    (SELECT test_id FROM e_mapping_test where uid_test = mt.uid limit 1) as bridging_code,
+    (SELECT test_id FROM e_mapping_test where uid_test = mt.uid and enabled = true limit 1) as bridging_code,
     'PK' as department_type
     FROM m_test as mt
     inner join m_departement md ON md.uid = mt.uid_departement
@@ -146,6 +150,7 @@ const querydata = [
       "position",
       "members",
       "department_type",
+      "local_code",
     ],
     query: `SELECT
     md.departement,
@@ -203,6 +208,7 @@ const querydata = [
       "high_flag",
       "critical_low_flag",
       "critical_high_flag",
+      "local_code"
     ],
     query: `SELECT mt.test_name AS name,
     numeric.age_min, 
@@ -233,7 +239,8 @@ const querydata = [
     'L' as low_flag,
     'H' as high_flag,
     'CL' as critical_low_flag,
-    'CH' as critical_high_flag
+    'CH' as critical_high_flag,
+    mt.id as local_code
     FROM m_normal_value_numeric_detail AS numeric
     INNER JOIN m_test mt ON mt.uid = numeric.uid_test
     where mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840' and numeric.enabled = true
@@ -257,6 +264,7 @@ const querydata = [
       "normal_flag",
       "abnormal_flag",
       "options",
+      "local_code"
     ],
     query: `SELECT mt.test_name AS name, 
     alpha.age_min, 
@@ -305,6 +313,7 @@ ORDER BY (
       "female_value",
       "normal_flag",
       "abnormal_flag",
+      "local_code"
     ],
     query: `SELECT mt.test_name AS name, 
     l.age_min, 
