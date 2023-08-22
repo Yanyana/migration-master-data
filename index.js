@@ -65,7 +65,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.english_name,
               formatPosition(row.position),
               row.type,
-              row.department_type
+              row.department_type,
+              row.local_code
             ]);
             break;
 
@@ -116,7 +117,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.speciment,
               formatPosition(row.position),
               row.members,
-              row.department_type
+              row.department_type,
+              row.local_code
             ]);
             break;
 
@@ -140,6 +142,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.high_flag,
               row.critical_low_flag,
               row.critical_high_flag,
+              row.local_code
             ]);
             break;
 
@@ -155,6 +158,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.normal_flag,
               row.abnormal_flag,
               row.options,
+              row.local_code
             ]);
             break;
 
@@ -173,6 +177,7 @@ async function exportTablesToExcel(outputPath, tables) {
                 : row.unspecified_normal_value,
               row.normal_flag,
               row.abnormal_flag,
+              row.local_code
             ]);
             break;
 

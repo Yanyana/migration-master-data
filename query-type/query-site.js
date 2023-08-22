@@ -30,24 +30,36 @@ const querydata = [
       "department_type",
       "local_code"
     ],
-    query: `SELECT md.departement as name,
-    md.language_1 as english_name,
-    md.position,
-    'DEPARTMENT' AS type,
-    'PK' AS department_type,
-    md.id as local_code
-  FROM m_departement md
-  where md.enabled = true
-  ORDER BY position
-  UNION
-  SELECT gr.group AS name,
-    gr.language_1 AS english_name,
-    gr.position,
-    'SUB_DEPARTMENT' AS type,
-    'PK' AS department_type, 
-    gr.id as local_code
-  FROM m_group as gr
-  where gr.enabled = true`,
+    query: `SELECT * FROM (
+      SELECT
+          md.departement AS name,
+          md.language_1 AS english_name,
+          md.position,
+          'DEPARTMENT' AS type,
+          'PK' AS department_type,
+          md.uid AS local_code
+      FROM
+          m_departement md
+      WHERE
+          md.enabled = true
+      UNION
+      SELECT
+          gr.group AS name,
+          gr.language_1 AS english_name,
+          gr.position,
+          'SUB_DEPARTMENT' AS type,
+          'PK' AS department_type,
+          gr.uid AS local_code
+      FROM
+          m_group AS gr
+      WHERE
+          gr.enabled = true
+  ) AS combined_data
+  ORDER BY (
+      SELECT ARRAY_AGG(CAST(elem AS INTEGER))
+      FROM UNNEST(STRING_TO_ARRAY(combined_data.position, '.')) AS elem
+  ) ASC;
+  `,
   },
   {
     id: 2,
@@ -95,7 +107,7 @@ const querydata = [
     md.departement, 
     parentTest.id as parent,
     mt.alias_code, 
-    mt.id as local_code, 
+    mt.uid as local_code, 
     mt.test_name as name,
     Case when mt.language_1 = 'null' then NULL 
     when mt.language_1 = '' then NULL else mt.test_name end as english_name, 
@@ -168,7 +180,7 @@ const querydata = [
     )) AS specimen,
     mtp.position,
     (
-      SELECT string_agg(mt.id::text, ', ' ORDER BY mt.position ASC)
+      SELECT string_agg(mt.uid, ', ' ORDER BY mt.position ASC)
       FROM m_test mt
       WHERE mt.uid IN (SELECT ctestpanel.uid_test
                        FROM c_test_panel ctestpanel
@@ -176,7 +188,7 @@ const querydata = [
                        AND mt.enabled = true
     ) AS members,
     'PK' AS department_type,
-    mtp.id as local_code
+    mtp.uid as local_code
   FROM
     m_test_panel mtp
   INNER JOIN
@@ -240,7 +252,7 @@ const querydata = [
     'H' as high_flag,
     'CL' as critical_low_flag,
     'CH' as critical_high_flag,
-    mt.id as local_code
+    mt.uid as local_code
     FROM m_normal_value_numeric_detail AS numeric
     INNER JOIN m_test mt ON mt.uid = numeric.uid_test
     where mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840' and numeric.enabled = true
@@ -286,7 +298,7 @@ const querydata = [
     NULL AS normal_flag,
     '*' AS abnormal_flag,
     COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options,
-    mt.id as local_code
+    mt.uid as local_code
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
     AND alpha.enabled = true
@@ -338,7 +350,7 @@ ORDER BY (
     l.unspecified_normal_value, 
     l.normal_flag, 
     l.abnormal_flag,
-    mt.id as local_code
+    mt.uid as local_code
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
     where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true
