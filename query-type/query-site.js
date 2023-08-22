@@ -180,7 +180,7 @@ const querydata = [
     )) AS specimen,
     mtp.position,
     (
-      SELECT string_agg(mt.uid, ', ' ORDER BY mt.position ASC)
+      SELECT string_agg(mt.uid::text, ', ' ORDER BY mt.position ASC)
       FROM m_test mt
       WHERE mt.uid IN (SELECT ctestpanel.uid_test
                        FROM c_test_panel ctestpanel
