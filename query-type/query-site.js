@@ -30,16 +30,7 @@ const querydata = [
       "department_type",
       "local_code"
     ],
-    query: `SELECT gr.group AS name,
-    gr.language_1 AS english_name,
-    gr.position,
-    'SUB_DEPARTMENT' AS type,
-    'PK' AS department_type, 
-    gr.id as local_code
-  FROM m_group as gr
-  where gr.enabled = true
-  UNION
-  SELECT md.departement as name,
+    query: `SELECT md.departement as name,
     md.language_1 as english_name,
     md.position,
     'DEPARTMENT' AS type,
@@ -47,7 +38,16 @@ const querydata = [
     md.id as local_code
   FROM m_departement md
   where md.enabled = true
-  ORDER BY position;`,
+  ORDER BY position
+  UNION
+  SELECT gr.group AS name,
+    gr.language_1 AS english_name,
+    gr.position,
+    'SUB_DEPARTMENT' AS type,
+    'PK' AS department_type, 
+    gr.id as local_code
+  FROM m_group as gr
+  where gr.enabled = true`,
   },
   {
     id: 2,
@@ -93,7 +93,7 @@ const querydata = [
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
     mt.position, 
     md.departement, 
-    parentTest.test_name as parent,
+    parentTest.id as parent,
     mt.alias_code, 
     mt.id as local_code, 
     mt.test_name as name,
