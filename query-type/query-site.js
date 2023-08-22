@@ -104,8 +104,8 @@ const querydata = [
     query: `SELECT 
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
     mt.position, 
-    md.departement, 
-    parentTest.id as parent,
+    md.uid as departement, 
+    parentTest.uid as parent,
     mt.alias_code, 
     mt.uid as local_code, 
     mt.test_name as name,
@@ -117,7 +117,10 @@ const querydata = [
     Case when mt.id_parent IS NOT NULL then false else true end as is_transaction,
     Case when mt.id_parent IS NOT NULL then true else true end as is_analyze,
     Case when mt.formula IS NULL then false else mt.formula end as is_formula,
-    Case when mt.id_parent IS NOT NULL then false else false end as is_rulebase,
+    CASE 
+        WHEN (SELECT role_text FROM m_rolebase WHERE uid_test = mt.uid and use_reference = true and no_condition = true and enabled = true LIMIT 1) IS NOT NULL THEN true 
+        ELSE false 
+    END AS is_rulebase,
     ls.specimen, 
     ls.specimen as tube, 
     method.metode,
@@ -136,7 +139,8 @@ const querydata = [
     NULL as note_other_en,
     '10000' as price,
     (SELECT test_id FROM e_mapping_test where uid_test = mt.uid and enabled = true limit 1) as bridging_code,
-    'PK' as department_type
+    'PK' as department_type,
+    (SELECT role_text FROM m_rolebase WHERE uid_test = mt.uid and use_reference = true and no_condition = true and enabled = true LIMIT 1) as rulebase
     FROM m_test as mt
     inner join m_departement md ON md.uid = mt.uid_departement
     left join l_unit lu ON lu.uid = mt.uid_unit
