@@ -53,7 +53,7 @@ const querydata = [
       FROM
           m_group AS gr
       WHERE
-          gr.enabled = true
+          gr.enabled = true and EXISTS (SELECT * FROM m_test where uid_group = gr.uid)
   ) AS combined_data
   ORDER BY (
       SELECT ARRAY_AGG(CAST(elem AS INTEGER))
