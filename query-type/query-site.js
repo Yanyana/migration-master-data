@@ -28,7 +28,7 @@ const querydata = [
       "position",
       "type",
       "department_type",
-      "local_code"
+      "local_code",
     ],
     query: `SELECT * FROM (
       SELECT
@@ -224,22 +224,23 @@ const querydata = [
       "high_flag",
       "critical_low_flag",
       "critical_high_flag",
-      "local_code"
+      "local_code",
     ],
-    query: `SELECT mt.test_name AS name,
+    query: `SELECT DISTINCT mt.test_name AS name,
+    mt.position AS position,
     numeric.age_min, 
     CASE
         WHEN numeric.age_unit = 'b' THEN 'MONTH'
         WHEN numeric.age_unit = 't' THEN 'YEAR'
         WHEN numeric.age_unit = 'h' THEN 'DAY'
-    ELSE 'YEAR'
+        ELSE 'YEAR'
     END AS age_min_unit,
     numeric.age_max,
     CASE
         WHEN numeric.age_unit = 'b' THEN 'MONTH'
         WHEN numeric.age_unit = 't' THEN 'YEAR'
         WHEN numeric.age_unit = 'h' THEN 'DAY'
-    ELSE 'YEAR'
+        ELSE 'YEAR'
     END AS age_max_unit, 
     numeric.male_min as low_male, 
     numeric.male_max as high_male, 
@@ -257,13 +258,11 @@ const querydata = [
     'CL' as critical_low_flag,
     'CH' as critical_high_flag,
     mt.uid as local_code
-    FROM m_normal_value_numeric_detail AS numeric
-    INNER JOIN m_test mt ON mt.uid = numeric.uid_test
-    where mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840' and numeric.enabled = true
-    ORDER BY (
-        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
-        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
-    ) ASC;`,
+FROM m_normal_value_numeric_detail AS numeric
+INNER JOIN m_test mt ON mt.uid = numeric.uid_test
+WHERE (mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840') 
+    AND numeric.enabled = true
+ORDER BY mt.position ASC;`,
   },
   {
     id: 5,
@@ -280,9 +279,10 @@ const querydata = [
       "normal_flag",
       "abnormal_flag",
       "options",
-      "local_code"
+      "local_code",
     ],
-    query: `SELECT mt.test_name AS name, 
+    query: `SELECT DISTINCT mt.test_name AS name, 
+    mt.position,
     alpha.age_min, 
     CASE
         WHEN alpha.age_unit = 'b' THEN 'MONTH'
@@ -308,10 +308,7 @@ const querydata = [
     AND alpha.enabled = true
     AND mt.enabled = true
 where mt.uid_result_input_type = '11c28a21-4f22-4659-8671-8d97defded3f' OR mt.uid_result_type_free_text = '11c28a21-4f22-4659-8671-8d97defded3f' and alpha.enabled = true and mt.enabled = true
-ORDER BY (
-        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
-        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
-    ) ASC;`,
+ORDER BY mt.position ASC;`,
   },
   {
     id: 6,
@@ -329,9 +326,10 @@ ORDER BY (
       "female_value",
       "normal_flag",
       "abnormal_flag",
-      "local_code"
+      "local_code",
     ],
-    query: `SELECT mt.test_name AS name, 
+    query: `SELECT DISTINCT mt.test_name AS name, 
+    mt.position as position,
     l.age_min, 
     CASE
         WHEN l.age_unit = 'b' THEN 'MONTH'
@@ -358,10 +356,7 @@ ORDER BY (
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
     where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true
-    ORDER BY (
-        SELECT ARRAY_AGG(CAST(elem AS INTEGER))
-        FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
-    ) ASC;`,
+    ORDER BY position ASC;`,
   },
 ];
 

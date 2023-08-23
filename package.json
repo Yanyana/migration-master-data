@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
-    "start": "node index.js",
+    "dev": "node scripts/prebuild.js && nodemon index.js",
+    "start": "node scripts/prebuild.js && node index.js",
     "prebuild": "node scripts/prebuild.js"
   },
   "author": "",
