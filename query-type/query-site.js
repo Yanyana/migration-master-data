@@ -225,6 +225,7 @@ const querydata = [
       "critical_low_flag",
       "critical_high_flag",
       "local_code",
+      "id_nilai_normal_v1"
     ],
     query: `SELECT DISTINCT mt.test_name AS name,
     mt.position AS position,
@@ -257,7 +258,8 @@ const querydata = [
     'H' as high_flag,
     'CL' as critical_low_flag,
     'CH' as critical_high_flag,
-    mt.uid as local_code
+    mt.uid as local_code,
+    numeric.uid as id_nilai_normal_v1
 FROM m_normal_value_numeric_detail AS numeric
 INNER JOIN m_test mt ON mt.uid = numeric.uid_test
 WHERE (mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840') 
@@ -280,6 +282,7 @@ ORDER BY mt.position ASC;`,
       "abnormal_flag",
       "options",
       "local_code",
+      "id_nilai_normal_v1",
     ],
     query: `SELECT DISTINCT mt.test_name AS name, 
     mt.position,
@@ -302,7 +305,8 @@ ORDER BY mt.position ASC;`,
     NULL AS normal_flag,
     '*' AS abnormal_flag,
     COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options,
-    mt.uid as local_code
+    mt.uid as local_code,
+    alpha.uid as id_nilai_normal_v1
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
     AND alpha.enabled = true
@@ -327,6 +331,7 @@ ORDER BY mt.position ASC;`,
       "normal_flag",
       "abnormal_flag",
       "local_code",
+      "id_nilai_normal_v1"
     ],
     query: `SELECT DISTINCT mt.test_name AS name, 
     mt.position as position,
@@ -352,7 +357,8 @@ ORDER BY mt.position ASC;`,
     l.unspecified_normal_value, 
     l.normal_flag, 
     l.abnormal_flag,
-    mt.uid as local_code
+    mt.uid as local_code,
+    l.uid as id_nilai_normal_v1
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
     where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true

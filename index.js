@@ -142,7 +142,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.high_flag,
               row.critical_low_flag,
               row.critical_high_flag,
-              row.local_code
+              row.local_code,
+              row.id_nilai_normal_v1
             ]);
             break;
 
@@ -158,7 +159,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.normal_flag,
               row.abnormal_flag,
               row.options,
-              row.local_code
+              row.local_code,
+              row.id_nilai_normal_v1
             ]);
             break;
 
@@ -177,7 +179,8 @@ async function exportTablesToExcel(outputPath, tables) {
                 : row.unspecified_normal_value,
               row.normal_flag,
               row.abnormal_flag,
-              row.local_code
+              row.local_code,
+              row.id_nilai_normal_v1
             ]);
             break;
 
