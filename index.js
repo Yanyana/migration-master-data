@@ -105,7 +105,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.note_other_en,
               row.price,
               row.bridging_code,
-              row.department_type
+              row.department_type,
+              row.is_active
             ]);
             break;
 
@@ -118,7 +119,8 @@ async function exportTablesToExcel(outputPath, tables) {
               formatPosition(row.position),
               row.members,
               row.department_type,
-              row.local_code
+              row.local_code,
+              row.is_active
             ]);
             break;
 
@@ -143,7 +145,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.critical_low_flag,
               row.critical_high_flag,
               row.local_code,
-              row.id_nilai_normal_v1
+              row.id_nilai_normal_v1,
+              row.is_active
             ]);
             break;
 
@@ -160,7 +163,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.abnormal_flag,
               row.options,
               row.local_code,
-              row.id_nilai_normal_v1
+              row.id_nilai_normal_v1,
+              row.is_active
             ]);
             break;
 
@@ -180,7 +184,8 @@ async function exportTablesToExcel(outputPath, tables) {
               row.normal_flag,
               row.abnormal_flag,
               row.local_code,
-              row.id_nilai_normal_v1
+              row.id_nilai_normal_v1,
+              row.is_active
             ]);
             break;
 

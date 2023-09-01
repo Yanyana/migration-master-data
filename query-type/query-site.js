@@ -100,6 +100,7 @@ const querydata = [
       "price",
       "bridging_code",
       "department_type",
+      "is_active"
     ],
     query: `SELECT 
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
@@ -307,7 +308,7 @@ ORDER BY mt.position ASC;`,
     alpha.female_text as female_value,
     NULL AS normal_flag,
     '*' AS abnormal_flag,
-    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options,
+    COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid), alpha.male_text) AS options,
     mt.uid as local_code,
     alpha.uid as id_nilai_normal_v1,
     alpha.enabled as is_active
