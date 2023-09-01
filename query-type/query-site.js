@@ -140,7 +140,8 @@ const querydata = [
     '10000' as price,
     (SELECT test_id FROM e_mapping_test where uid_test = mt.uid and enabled = true limit 1) as bridging_code,
     'PK' as department_type,
-    (SELECT role_text FROM m_rolebase WHERE uid_test = mt.uid and use_reference = true and no_condition = true and enabled = true LIMIT 1) as rulebase
+    (SELECT role_text FROM m_rolebase WHERE uid_test = mt.uid and use_reference = true and no_condition = true and enabled = true LIMIT 1) as rulebase,
+    mt.enabled as is_active
     FROM m_test as mt
     inner join m_departement md ON md.uid = mt.uid_departement
     left join l_unit lu ON lu.uid = mt.uid_unit
@@ -148,7 +149,6 @@ const querydata = [
     left join l_specimen ls ON ls.uid = mt.uid_specimen
     left join m_method_lab method ON method.uid = mt.uid_method
     left join l_results_type result ON result.uid = mt.uid_result_input_type
-    where mt.enabled = true
     ORDER BY (
         SELECT ARRAY_AGG(CAST(elem AS INTEGER))
         FROM UNNEST(STRING_TO_ARRAY(mt.position, '.')) AS elem
@@ -167,6 +167,7 @@ const querydata = [
       "members",
       "department_type",
       "local_code",
+      "is_active",
     ],
     query: `SELECT
     md.departement,
@@ -192,12 +193,12 @@ const querydata = [
                        AND mt.enabled = true
     ) AS members,
     'PK' AS department_type,
-    mtp.uid as local_code
+    mtp.uid as local_code,
+    mtp.enabled as is_active
   FROM
     m_test_panel mtp
   INNER JOIN
     m_departement md ON md.uid = mtp.uid_departement
-  where mtp.enabled = true
   ORDER BY
     mtp.position ASC;`,
   },
@@ -225,7 +226,8 @@ const querydata = [
       "critical_low_flag",
       "critical_high_flag",
       "local_code",
-      "id_nilai_normal_v1"
+      "id_nilai_normal_v1",
+      "is_active",
     ],
     query: `SELECT DISTINCT mt.test_name AS name,
     mt.position AS position,
@@ -259,11 +261,11 @@ const querydata = [
     'CL' as critical_low_flag,
     'CH' as critical_high_flag,
     mt.uid as local_code,
-    numeric.uid as id_nilai_normal_v1
+    numeric.uid as id_nilai_normal_v1,
+    numeric.enabled as is_active
 FROM m_normal_value_numeric_detail AS numeric
 INNER JOIN m_test mt ON mt.uid = numeric.uid_test
 WHERE (mt.uid_result_input_type = '20602a4d-d1cf-4fea-b302-29ea0634b840' OR mt.uid_result_type_free_text = '20602a4d-d1cf-4fea-b302-29ea0634b840') 
-    AND numeric.enabled = true
 ORDER BY mt.position ASC;`,
   },
   {
@@ -283,6 +285,7 @@ ORDER BY mt.position ASC;`,
       "options",
       "local_code",
       "id_nilai_normal_v1",
+      "is_active",
     ],
     query: `SELECT DISTINCT mt.test_name AS name, 
     mt.position,
@@ -306,11 +309,10 @@ ORDER BY mt.position ASC;`,
     '*' AS abnormal_flag,
     COALESCE((SELECT string_agg(opt.alphanum_ref, ', ' ORDER BY opt.id ASC) FROM l_alphanum_ref AS opt WHERE opt.uid_test = mt.uid and opt.enabled = true), alpha.male_text) AS options,
     mt.uid as local_code,
-    alpha.uid as id_nilai_normal_v1
+    alpha.uid as id_nilai_normal_v1,
+    alpha.enabled as is_active
     FROM m_normal_value_alphanum_detail AS alpha
     INNER JOIN m_test mt ON alpha.uid_test = mt.uid
-    AND alpha.enabled = true
-    AND mt.enabled = true
 where mt.uid_result_input_type = '11c28a21-4f22-4659-8671-8d97defded3f' OR mt.uid_result_type_free_text = '11c28a21-4f22-4659-8671-8d97defded3f' and alpha.enabled = true and mt.enabled = true
 ORDER BY mt.position ASC;`,
   },
@@ -331,7 +333,8 @@ ORDER BY mt.position ASC;`,
       "normal_flag",
       "abnormal_flag",
       "local_code",
-      "id_nilai_normal_v1"
+      "id_nilai_normal_v1",
+      "is_active",
     ],
     query: `SELECT DISTINCT mt.test_name AS name, 
     mt.position as position,
@@ -358,10 +361,11 @@ ORDER BY mt.position ASC;`,
     l.normal_flag, 
     l.abnormal_flag,
     mt.uid as local_code,
-    l.uid as id_nilai_normal_v1
+    l.uid as id_nilai_normal_v1,
+    l.enabled as is_active
     FROM m_normal_value_limitation_detail AS l
     INNER JOIN m_test mt ON l.uid_test = mt.uid
-    where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' and l.enabled = true and mt.enabled = true
+    where mt.uid_result_input_type = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed' OR mt.uid_result_type_free_text = 'ef891bdb-ee9b-43a9-a951-8fa2d8f9dbed'
     ORDER BY position ASC;`,
   },
 ];
