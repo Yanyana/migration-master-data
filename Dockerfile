@@ -2,7 +2,6 @@
 FROM node:lts-alpine3.15
 
 # Mengatur working directory di dalam container
-# WORKDIR /app
 
 # Menyalin package.json dan package-lock.json (jika ada)
 COPY package*.json ./
