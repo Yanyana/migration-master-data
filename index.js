@@ -207,6 +207,7 @@ async function exportTablesToExcel(outputPath, tables) {
         column.width = Math.max(column.width, 12);
       });
     }
+    console.log(__dirname)
     await workbook.xlsx.writeFile(outputPath);
     console.log(`Tabel berhasil diekspor ke ${outputPath}`);
   } catch (error) {
