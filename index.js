@@ -219,5 +219,5 @@ async function exportTablesToExcel(outputPath, tables) {
 }
 
 // Eksekusi fungsi exportTablesToExcel
-const outputFilePath = join(__dirname + "/master/", "master-data.xlsx");
+const outputFilePath = join(__dirname, "master-data.xlsx");
 exportTablesToExcel(outputFilePath, tables);
