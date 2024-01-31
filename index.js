@@ -21,6 +21,9 @@ const dbConfig = {
 const tables = querydata;
 
 function formatPosition(tanggal) {
+  if (!tanggal) {
+    return "";
+  }
   const parts = tanggal.split(".");
   const formattedParts = parts.map((part) => parseInt(part).toString()); // Menghapus angka nol pada awal setiap bagian
 
@@ -66,7 +69,7 @@ async function exportTablesToExcel(outputPath, tables) {
               formatPosition(row.position),
               row.type,
               row.department_type,
-              row.local_code
+              row.local_code,
             ]);
             break;
 
@@ -106,7 +109,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.price,
               row.bridging_code,
               row.department_type,
-              row.is_active
+              row.is_active,
             ]);
             break;
 
@@ -120,7 +123,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.members,
               row.department_type,
               row.local_code,
-              row.is_active
+              row.is_active,
             ]);
             break;
 
@@ -146,7 +149,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.critical_high_flag,
               row.local_code,
               row.id_nilai_normal_v1,
-              row.is_active
+              row.is_active,
             ]);
             break;
 
@@ -164,7 +167,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.options,
               row.local_code,
               row.id_nilai_normal_v1,
-              row.is_active
+              row.is_active,
             ]);
             break;
 
@@ -185,7 +188,7 @@ async function exportTablesToExcel(outputPath, tables) {
               row.abnormal_flag,
               row.local_code,
               row.id_nilai_normal_v1,
-              row.is_active
+              row.is_active,
             ]);
             break;
 
@@ -207,7 +210,7 @@ async function exportTablesToExcel(outputPath, tables) {
         column.width = Math.max(column.width, 12);
       });
     }
-    console.log(__dirname)
+    console.log(__dirname);
     await workbook.xlsx.writeFile(outputPath);
     console.log(`Tabel berhasil diekspor ke ${outputPath}`);
   } catch (error) {
