@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-const port = process.env.DB_PORT || 5000;
+const port = process.env.APP_PORT || 4080;
 
 app.get('/download', (req, res) => {
   const outputFilePath = join(__dirname, 'master-data.xlsx');
