@@ -171,7 +171,7 @@ const querydata = [
       "is_active",
     ],
     query: `SELECT
-    md.departement,
+    md.uid as departement,
     mtp.panel_name AS name,
     CASE WHEN mtp.language_1 = '' THEN NULL ELSE mtp.language_1 END AS english_name,
     (SELECT COALESCE(
