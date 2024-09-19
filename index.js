@@ -213,6 +213,7 @@ async function exportTablesToExcel(outputPath, tables) {
     console.log(__dirname);
     await workbook.xlsx.writeFile(outputPath);
     console.log(`Tabel berhasil diekspor ke ${outputPath}`);
+    return `Tabel berhasil diekspor ke ${outputPath}`;
   } catch (error) {
     console.error("Terjadi kesalahan saat mengekspor tabel:", error);
   } finally {
@@ -222,5 +223,8 @@ async function exportTablesToExcel(outputPath, tables) {
 }
 
 // Eksekusi fungsi exportTablesToExcel
-const outputFilePath = join(__dirname, "master-data.xlsx");
-exportTablesToExcel(outputFilePath, tables);
+// const outputFilePath = join(__dirname, "master-data.xlsx");
+// exportTablesToExcel(outputFilePath, tables);
+module.exports = {
+  exportTablesToExcel
+}

@@ -1,14 +1,18 @@
 const express = require('express');
 const { join } = require('path');
 const dotenv = require("dotenv");
+const { exportTablesToExcel } = require('.');
+const { querydata } = require('./query-type/query-default');
 dotenv.config();
 
 const app = express();
 const port = process.env.APP_PORT || 4080;
+const tables = querydata;
+const outputFilePath = join(__dirname, "master-data.xlsx");
 
-app.get('/download', (req, res) => {
-  const outputFilePath = join(__dirname, 'master-data.xlsx');
-
+app.get('/download', async(req, res) => {
+  const createFile = await exportTablesToExcel(outputFilePath, tables);
+  console.log(createFile, 'success')
   // Menentukan nama file saat didownload
   const downloadFileName = 'downloaded-master-data.xlsx';
 
