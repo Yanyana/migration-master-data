@@ -8,6 +8,8 @@ services:
       - ./.env
     volumes:
       - master:/app/master
+    ports:
+      - 4080:4080
 
 volumes:
   master:
