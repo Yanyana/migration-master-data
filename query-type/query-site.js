@@ -104,6 +104,7 @@ const querydata = [
     ],
     query: `SELECT 
     Case when mt.id_parent IS NOT NULL then 'SUB_TEST' else 'INDIVIDUAL' end as type, 
+    'PK' AS department_type,
     mt.position, 
     md.uid as departement, 
     parentTest.uid as parent,
