@@ -112,7 +112,9 @@ const querydata = [
     mt.uid as local_code, 
     mt.test_name as name,
     Case when mt.language_1 = 'null' then NULL 
-    when mt.language_1 = '' then NULL else mt.test_name end as english_name, 
+    when mt.language_1 = '' then NULL 
+    when mt.language_1 is not null then mt.language_1
+    else mt.test_name end as english_name, 
     lu.unit, 
     mt.decimal_digit as decimal, 
     REPLACE(UPPER(result.results_type), ' ', '') as result_type, 
